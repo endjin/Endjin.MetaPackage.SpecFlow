@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Endjin.MetaPackage.SpecFlow</id>
+    <version>3.3.30</version>
+    <title>Endjin SpecFlow Meta Package</title>
+    <authors>endjin</authors>
+    <owners>endjin</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A metapackage that collates all the SpecFlow packages we care about and simplifies our dependency management process</description>
+    <tags>endjin metapackage</tags>
+    <dependencies>
+      <dependency id="SpecFlow.NUnit" version="3.3.30" />
+      <dependency id="SpecFlow.Tools.MsBuild.Generation" version="3.3.30" />
+    </dependencies>
+  </metadata>
+  <files/>
+</package>

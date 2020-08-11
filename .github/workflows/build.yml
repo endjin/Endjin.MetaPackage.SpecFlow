@@ -32,11 +32,6 @@ jobs:
       run: |
         pwsh -noprofile -c '(dotnet-gitversion | ConvertFrom-Json).psobject.properties | % { echo ("::set-output name={0}::{1}" -f $_.name, $_.value) }'
 
-    - name: Build NuGet Package
+    - name: Test Build NuGet Package
       run: |
         nuget pack ./${{ env.NUGET_PACKAGE_NAME }}.nuspec -Version ${{ steps.run_gitversion.outputs.NuGetVersion }}
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: nuget-package
-        path: ./${{ env.NUGET_PACKAGE_NAME }}.${{ steps.run_gitversion.outputs.NuGetVersion }}.nupkg

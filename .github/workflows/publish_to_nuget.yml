@@ -3,24 +3,53 @@ on:
 - push
 - workflow_dispatch
 
+env:
+  NUGET_PACKAGE_NAME: Endjin.MetaPackage.SpecFlow
+
 jobs:
+  run_gitversion:
+    runs-on: ubuntu-latest
+    name: Run GitVersion
+    
+    outputs:
+      semver: ${{ steps.run_gitversion.outputs.semver }}
+      major: ${{ steps.run_gitversion.outputs.major }}
+      majorMinor: ${{ steps.run_gitversion.outputs.major }}.${{ steps.run_gitversion.outputs.minor }}
+      preReleaseTag: ${{ steps.run_gitversion.outputs.preReleaseTag }}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+    - name: Install GitVersion
+      run: |
+        dotnet tool install -g GitVersion.Tool --version 5.2.4
+        echo "::add-path::/github/home/.dotnet/tools"    
+    - name: Run GitVersion
+      id: run_gitversion
+      run: |
+        pwsh -noprofile -c '(dotnet-gitversion | ConvertFrom-Json).psobject.properties | % { echo ("::set-output name={0}::{1}" -f $_.name, $_.value) }'
+
   publish_to_nuget:
     runs-on: ubuntu-latest
     name: Publish to NuGet.org
-    # only trigger for pushed tags
-    if: |
-      startsWith(github.event.ref, 'refs/tags/')
+    needs: run_gitversion
     steps:
     - uses: actions/checkout@v2
 
-    - uses: actions/download-artifact@v2
-      id: download
+    - uses: NuGet/setup-nuget@v1.0.2
       with:
-        name: nuget-package
+        nuget-version: 5.x
+
+    - name: Build NuGet Package
+      run: |
+        nuget pack ./${{ env.NUGET_PACKAGE_NAME }}.nuspec -Version ${{ steps.run_gitversion.outputs.NuGetVersion }}
 
     - name: Push to NuGet.org
       run: |
         echo "Publishing: $PACKAGE_PATH"
-        dotnet nuget push $PACKAGE_PATH ${{ secrets.ENDJIN_NUGET_APIKEY }}
+        nuget push $PACKAGE_PATH ${{ secrets.ENDJIN_NUGET_APIKEY }}
       env:
-        PACKAGE_PATH: ${{ steps.download.outputs.download-path }} 
+        PACKAGE_PATH: ./${{ env.NUGET_PACKAGE_NAME }}.${{ steps.run_gitversion.outputs.NuGetVersion }}.nupkg 

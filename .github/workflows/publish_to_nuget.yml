@@ -29,14 +29,14 @@ jobs:
     - name: Run GitVersion
       id: run_gitversion
       run: |
-        pwsh -noprofile -c '(dotnet-gitversion | ConvertFrom-Json).psobject.properties | % { echo ("::set-output name={0}::{1}" -f $_.name, $_.value) }'
+        pwsh -noprofile -c '(dotnet-gitversion | ConvertFrom-Json).psobject.properties | % { echo ("{0}={1}`n::set-output name={0}::{1}" -f $_.name, $_.value) }'
 
   publish_to_nuget:
     runs-on: ubuntu-latest
     name: Publish to NuGet.org
     needs: run_gitversion
     env:
-      PACKAGE_VERSION: ${{ needs.run_gitversion.outputs.nuGetVersion }}
+      PACKAGE_VERSION: ${{ needs.run_gitversion.outputs.nugetVersion }}
     steps:
     - uses: actions/checkout@v2
 

@@ -12,6 +12,7 @@
     <dependencies>
       <dependency id="SpecFlow.NUnit" version="3.3.30" />
       <dependency id="SpecFlow.Tools.MsBuild.Generation" version="3.3.30" />
+      <dependency id="Corvus.Testing.SpecFlow" version="1.0.0" />
     </dependencies>
   </metadata>
   <files/>

@@ -14,9 +14,7 @@ jobs:
       startsWith(github.event.ref, 'refs/tags/')
     outputs:
       semver: ${{ steps.run_gitversion.outputs.semver }}
-      major: ${{ steps.run_gitversion.outputs.major }}
-      majorMinor: ${{ steps.run_gitversion.outputs.major }}.${{ steps.run_gitversion.outputs.minor }}
-      preReleaseTag: ${{ steps.run_gitversion.outputs.preReleaseTag }}
+      nugetVersion: ${{ steps.run_gitversion.outputs.nugetVersion }}
     steps:
     - uses: actions/checkout@v2
       with:
@@ -46,11 +44,11 @@ jobs:
 
     - name: Build NuGet Package
       run: |
-        nuget pack ./${{ env.NUGET_PACKAGE_NAME }}.nuspec -Version ${{ steps.run_gitversion.outputs.NuGetVersion }}
+        nuget pack ./${{ env.NUGET_PACKAGE_NAME }}.nuspec -Version ${{ needs.run_gitversion.outputs.nuGetVersion }}
 
     - name: Push to NuGet.org
       run: |
         echo "Publishing: $PACKAGE_PATH"
         nuget push $PACKAGE_PATH ${{ secrets.ENDJIN_NUGET_APIKEY }}
       env:
-        PACKAGE_PATH: ./${{ env.NUGET_PACKAGE_NAME }}.${{ steps.run_gitversion.outputs.NuGetVersion }}.nupkg 
+        PACKAGE_PATH: ./${{ env.NUGET_PACKAGE_NAME }}.${{ steps.run_gitversion.outputs.nuGetVersion }}.nupkg 

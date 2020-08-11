@@ -35,6 +35,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Publish to NuGet.org
     needs: run_gitversion
+    env:
+      PACKAGE_VERSION: ${{ needs.run_gitversion.outputs.nuGetVersion }}
     steps:
     - uses: actions/checkout@v2
 
@@ -44,11 +46,11 @@ jobs:
 
     - name: Build NuGet Package
       run: |
-        nuget pack ./${{ env.NUGET_PACKAGE_NAME }}.nuspec -Version ${{ needs.run_gitversion.outputs.nuGetVersion }}
+        nuget pack ./${{ env.NUGET_PACKAGE_NAME }}.nuspec -Version ${{ env.PACKAGE_VERSION }}
 
     - name: Push to NuGet.org
       run: |
         echo "Publishing: $PACKAGE_PATH"
         nuget push $PACKAGE_PATH ${{ secrets.ENDJIN_NUGET_APIKEY }}
       env:
-        PACKAGE_PATH: ./${{ env.NUGET_PACKAGE_NAME }}.${{ steps.run_gitversion.outputs.nuGetVersion }}.nupkg 
+        PACKAGE_PATH: ./${{ env.NUGET_PACKAGE_NAME }}.${{ env.PACKAGE_VERSION }}.nupkg

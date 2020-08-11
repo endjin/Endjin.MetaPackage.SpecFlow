@@ -10,7 +10,8 @@ jobs:
   run_gitversion:
     runs-on: ubuntu-latest
     name: Run GitVersion
-    
+    if: |
+      startsWith(github.event.ref, 'refs/tags/')
     outputs:
       semver: ${{ steps.run_gitversion.outputs.semver }}
       major: ${{ steps.run_gitversion.outputs.major }}

@@ -1,0 +1,26 @@
+name: publish_to_nuget
+on:
+- push
+- workflow_dispatch
+
+jobs:
+  publish_to_nuget:
+    runs-on: ubuntu-latest
+    name: Publish to NuGet.org
+    # only trigger for pushed tags
+    if: |
+      startsWith(github.event.ref, 'refs/tags/')
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/download-artifact@v2
+      id: download
+      with:
+        name: nuget-package
+
+    - name: Push to NuGet.org
+      run: |
+        echo "Publishing: $PACKAGE_PATH"
+        dotnet nuget push $PACKAGE_PATH ${{ secrets.ENDJIN_NUGET_APIKEY }}
+      env:
+        PACKAGE_PATH: ${{ steps.download.outputs.download-path }} 

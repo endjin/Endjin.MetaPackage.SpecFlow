@@ -3,10 +3,13 @@ on:
 - push
 - workflow_dispatch
 
+env:
+  NUGET_PACKAGE_NAME: Endjin.MetaPackage.SpecFlow
+
 jobs:
   build_package:
     runs-on: ubuntu-latest
-    name: Run Pester tests
+    name: Build Meta Package
     steps:
     - uses: actions/setup-dotnet@v1
       with:
@@ -29,6 +32,11 @@ jobs:
       run: |
         pwsh -noprofile -c '(dotnet-gitversion | ConvertFrom-Json).psobject.properties | % { echo ("::set-output name={0}::{1}" -f $_.name, $_.value) }'
 
-    - name: Test Build Package
+    - name: Build NuGet Package
       run: |
-        nuget pack ./Endjin.MetaPackage.SpecFlow.nuspec -Version ${{ steps.run_gitversion.outputs.NuGetVersion }}
+        nuget pack ./${{ env.NUGET_PACKAGE_NAME }}.nuspec -Version ${{ steps.run_gitversion.outputs.NuGetVersion }}
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: nuget-package
+        path: ./${{ env.NUGET_PACKAGE_NAME }}.${{ steps.run_gitversion.outputs.NuGetVersion }}.nupkg

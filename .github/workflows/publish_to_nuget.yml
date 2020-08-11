@@ -51,6 +51,7 @@ jobs:
     - name: Push to NuGet.org
       run: |
         echo "Publishing: $PACKAGE_PATH"
-        nuget push $PACKAGE_PATH ${{ secrets.ENDJIN_NUGET_APIKEY }}
+        echo "Sources: $(nuget sources)"
+        nuget push $PACKAGE_PATH ${{ secrets.ENDJIN_NUGET_APIKEY }} -Source "nuget.org"
       env:
         PACKAGE_PATH: ./${{ env.NUGET_PACKAGE_NAME }}.${{ env.PACKAGE_VERSION }}.nupkg
